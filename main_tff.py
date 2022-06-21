@@ -8,9 +8,10 @@ import numpy as np
 import random
 import tensorflow_federated as tff
 import tensorflow as tf
+from time import time
 
 np.random.seed(0)
-NUM_ROUNDS = 100
+NUM_ROUNDS = 10
 NUM_CLIENTS = 100
 NUM_TOTAL_CLIENTS = 3383
 NUM_EPOCHS = 5
@@ -73,7 +74,21 @@ def main(args):
 
     if args.secagg:
         print("Using Secure Aggregation")
-        model_aggregator = tff.learning.secure_aggregator(zeroing=False, clipping=False)
+        # model_aggregator = tff.learning.secure_aggregator(zeroing=False, clipping=False)
+        secagg_bound = tff.aggregators.PrivateQuantileEstimationProcess.no_noise(
+            initial_estimate=50.0,
+            target_quantile=0.95,
+            learning_rate=1.0,
+            multiplier=2.0,
+        )
+        model_aggregator = tff.aggregators.MeanFactory(
+            tff.aggregators.SecureSumFactory(secagg_bound)
+        )
+        model_aggregator = tff.aggregators.MeanFactory(
+            tff.aggregators.EncodedSumFactory.quantize_above_threshold(
+                quantization_bits=8, threshold=20000
+            )
+        )
     else:
         print("!!! NOT Using Secure Aggregation !!!")
         model_aggregator = tff.aggregators.MeanFactory()
@@ -108,4 +123,8 @@ if __name__ == "__main__":
     parser.set_defaults(secagg=False)
 
     args = parser.parse_args()
+    start = time()
     main(args)
+    end = time()
+    kwd = "with" if args.secagg else "WITHOUT"
+    print(f"TFF {kwd} took {end - start}.")

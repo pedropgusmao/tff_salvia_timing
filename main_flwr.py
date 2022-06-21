@@ -7,11 +7,12 @@ import flwr as fl
 import numpy as np
 import tensorflow as tf
 import tensorflow_federated as tff
+from time import tim
 
 
 np.random.seed(0)
 
-NUM_ROUNDS = 100
+NUM_ROUNDS = 10
 NUM_CLIENTS = 100
 NUM_TOTAL_CLIENTS = 3383
 NUM_EPOCHS = 5
@@ -112,4 +113,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    start = time()
     main()
+    end = time()
+    print(f"Flower without SecAgg took {end - start}.")
