@@ -7,7 +7,7 @@ import flwr as fl
 import numpy as np
 import tensorflow as tf
 import tensorflow_federated as tff
-from time import tim
+from time import time
 
 
 np.random.seed(0)
