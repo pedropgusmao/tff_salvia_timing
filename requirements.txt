@@ -1,0 +1,7 @@
+#python>=3.9.0
+black
+tensorflow-federated
+#tensorflow
+flwr
+ray==1.11.1
+nest-asyncio
